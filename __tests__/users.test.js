@@ -4,11 +4,13 @@ const request = require('supertest');
 const app = require('../lib/app');
 const UserService = require('../lib/services/UserService');
 
+//mocks out fake users with placeholder information for testing
 const mockUser = {
   email: 'test@example.com',
   password: '123456',
 };
 
+//mocks out a user registering and logging in for testing, same as in other test file
 const registerAndLogin = async (userProps = {}) => {
   const password = userProps.password ?? mockUser.password;
 
@@ -31,9 +33,10 @@ describe('users', () => {
   });
 
   it('creates a new user', async () => {
+    //calls our mock signup for the test
     const res = await request(app).post('/api/v1/users').send(mockUser);
     const { email } = mockUser;
-
+    //and checks if a user was created properly
     expect(res.body).toEqual({
       id: expect.any(String),
       email,
@@ -42,7 +45,9 @@ describe('users', () => {
 
   it('returns the current user', async () => {
     const [agent, user] = await registerAndLogin();
+    //test tries to grab the mocked user
     const me = await agent.get('/api/v1/users/me');
+    //and then checks to ensure the correct user was retrieved
     expect(me.body).toEqual({
       ...user,
       exp: expect.any(Number),
